@@ -1,0 +1,111 @@
+"use strict";
+let sises, isMobile;
+;(function($){
+  isMobile = {
+    Android: function() {
+      return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function() {
+      return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function() {
+      return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function() {
+      return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function() {
+      return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+    },
+    any: function() {
+      let mobileW = window.innerWidth*window.devicePixelRatio <= 768  && window.innerHeight*window.devicePixelRatio <= 640;
+      return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows() || mobileW );
+    }
+  };
+  sises = {
+    init: function(){
+      this.clamp();
+      this.customCarousel();
+      this.sticky();
+      this.selectRegioni();
+    },
+    clamp: function() {
+      let clamp = $('.clamp'),
+      i;
+      for(i = 0; i < clamp.length; i++) {
+        $clamp(clamp[i], {clamp: 2});
+      }
+    },
+    sticky: function() {
+      var stickySidebar = $('.sticky');
+      if (stickySidebar.length > 0) { 
+        var stickyHeight = stickySidebar.height(),
+            sidebarTop = stickySidebar.offset().top;
+      }
+
+      // on scroll move the sidebar
+      $(window).scroll(function () {
+        if (stickySidebar.length > 0) { 
+          var scrollTop = $(window).scrollTop();
+                  
+          if (sidebarTop < scrollTop) {
+            stickySidebar.css('top', scrollTop - sidebarTop);
+            stickySidebar.css('margin-top', '5rem');
+
+            // stop the sticky sidebar at the footer to avoid overlapping
+            var sidebarBottom = stickySidebar.offset().top + stickyHeight,
+                stickyStop = $('.main-content').offset().top + $('.main-content').height();
+            if (stickyStop < sidebarBottom) {
+              var stopPosition = $('.main-content').height() - stickyHeight;
+              stickySidebar.css('top', stopPosition);
+              stickySidebar.css('margin-top', '0');;
+            }
+          }
+          else {
+            stickySidebar.css('top', '0');
+            stickySidebar.css('margin-top', '0');;
+          } 
+        }
+      });
+      $(window).resize(function () {
+        if (stickySidebar.length > 0) { 
+          stickyHeight = stickySidebar.height();
+        }
+      });
+    },
+    selectRegioni: function() {
+      $('select#regione').select2();
+    },
+   customCarousel: function() {
+        $('.owl-carousel').each(function(i,e) {
+          var $this = $(e);
+          let pcSlide = $this.data('pc') ? $this.data('pc') : '5' ;
+          let tabletSlide = $this.data('tablet') ? $this.data('tablet') : '2' ;
+          let mobileSlide = $this.data('mobile') ? $this.data('mobile') : '1' ;
+          $this.owlCarousel({
+            loop:true,
+            margin:20,
+            nav:true,
+            navText:["<i class='fa fa-arrow-left'></i>","<i class='fa fa-arrow-right'></i>"],
+            autoplayHoverPause: true,
+            responsive:{
+                0:{
+                    items: mobileSlide,
+                    nav:false,
+                    dots: true,
+                },
+                768:{
+                    items: tabletSlide
+                },
+                1024:{
+                    items: pcSlide
+                }
+            }
+        });
+      });
+    },
+  };
+})(jQuery);
+jQuery(document).ready(function($) {
+  sises.init();
+});
